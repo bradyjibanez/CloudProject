@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chatter</title>
+</head>
+<body>
+    <!--reference to static css for front end design-->
+    <link href="{% static 'style.css' %}" rel="stylesheet" type="text/css">
+    <body style='background-color:grey'>
+    <center><a href="/" id="logo">CHATTER</a><br/></center>
+
+    <!--required to reference defined variable from signin view and allow user to see which room they are currently in-->
+    <center>This room: <h2>{{ room_name_json }}</h2></center>
+    <div style = "position:fixed; left:80px;">
+
+    <!--textarea required to create text box area that receives websocket defined messages from Daphne async server and show to all users with websocket connected to this room. First and second inputs allow for user to create message and submit to community received viewing textarea-->    
+    <center><textarea id="chat-log" cols="100" style="border: solid 1px #6E6E6E; color:#ffffff; background-color: transparent" rows="20" disabled></textarea><br/></center>
+    <input id="chat-message-input" type="text" style="border: solid 1px #6E6E6E; color:#ffffff" size="100" placeholder="Input your message here..."/><br/>
+     <input id="chat-message-submit"  input type="button" class = "button" value="Send"/>
+    </div>
+</body>
+<!--important reconnecting-websocket script created by joe walnes "found @ https://github.com/joewalnes/reconnecting-websocket". Allows for user to maintain connecting if within the chatroom window since Daphne async server is known to drop websocket connections. This script brings them back to life. Can be found in the Chatter main app folder under the static/chat directory--> 
+<script src="{% static 'reconnecting-websocket.js' %}"></script>
+
+<!--js scripting to call roomname and reconnecting websocket reference to allow for user to connect/reconnect on socket failure, send messages to allow involved in socket, and disconnect clean should any circumstance lead to user falling out of socket-->
+<script>
+    var roomName = {{ room_name_json }};
+
+    var chatSocket = new ReconnectingWebSocket(
+        'ws://' + window.location.host +
+        '/ws/chat/' + roomName + '/');
+
+    chatSocket.onmessage = function(e) {
+        var data = JSON.parse(e.data);
+        var message = data['message'];
+        document.querySelector('#chat-log').value += ("Message" + ": " + message + '\n');
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    //scripting for enter button input or click on button input //in function below this
+    document.querySelector('#chat-message-input').focus();
+    document.querySelector('#chat-message-input').onkeyup = function(e) {
+        if (e.keyCode === 13) {
+            document.querySelector('#chat-message-submit').click();
+        }
+    };
+
+    document.querySelector('#chat-message-submit').onclick = function(e) {
+        var messageInputDom = document.querySelector('#chat-message-input');
+        var message = messageInputDom.value;
+        chatSocket.send(JSON.stringify({
+            'message': message,
+            'command': 'new_message'
+        }));
+
+        messageInputDom.value = '';
+        
+    };
+</script>
+</html>

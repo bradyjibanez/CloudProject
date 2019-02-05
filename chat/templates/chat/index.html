@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chatter</title>
+</head>
+<body style='background-color:grey'>
+    <!--reference to static css for front end design-->
+    <link href="{% static 'style.css' %}" rel="stylesheet" type="text/css">
+    
+    <center><a href="/" id="logo">CHATTER</a><br/></center>
+
+    <!--welcome user by referencing username inputted from signin view, does not reference from db-->
+    <h4>Welcome to Chatter, {{ user }}!</h4>
+
+    <!--input of room name that will be saved to db-->
+    <input id="room-name-input" type="text" size="100" value="{{ room }}" "style="border: solid 1px #6E6E6E; color:#ffffff" placeholder="Create a ChatRoom here..." size="35"/><br/>
+    <input id="room-name-submit"  input type="submit" class = "button" value="Create ChatRoom"/>
+
+    <!--output of recent Chatter users and recently used chatrooms-->
+    <table style="width: 50%" rules="cols">
+    <tbody>
+    <tr>
+    <td valign="top"> <h3>Recently Online Chatterers</h3>
+    {% for name in names %}
+        <br>
+        <i>{{ name }}</i>
+    {% endfor %}</td></td>
+    <td valign="top"> <h3>Recently Used ChatteRooms</h3>
+    {% for room in rooms %}
+        <br>
+        <i>{{ room }}</i>
+    {% endfor %}</td></td>
+    </tr>
+    </tbody>
+    </table>
+
+    <!--js scripting to allow for websocket chatroom instatiation details, chatrooms themselves are only Websockets, and therefor not required to be saved to db...users can enter and exit any chatroom whenever they like because og the websocketing, all rooms always exist-->
+    <script>
+        document.querySelector('#room-name-input').focus();
+        //document.querySelector('#room-name-input').onkeyup //= function(e) {
+            //if (e.keyCode === 13) {  // enter, return
+            //    document.querySelector('#room-name-input').click();
+            //}
+        //};
+
+        document.querySelector('#room-name-submit').onclick = function(e) {
+            var roomName = document.querySelector('#room-name-input').value;
+            window.location.pathname = '/chat/' + roomName + '/';
+        };
+    </script>
+</body>
+</html>

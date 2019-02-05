@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chatter</title>
+</head>
+
+<body style='background-color:grey'>
+    <!--reference to static css for front end design-->
+    <link href="{% static 'style.css' %}" rel="stylesheet" type="text/css">
+    <center><a href="/" id="logo">CHATTER</a><br/></center>
+
+    <!--required to allow for form data to be inputted to the governing index channel and provide new user info-->
+    <form method="post" action="/index/">
+
+    <!--input fields that provide username to framework and submition option for user-->
+    <input id="user" name="user" type="text" size="100" value="{{ current_user }}" style="border: solid 1px #6E6E6E; color:#ffffff" placeholder="Create your UserName here..." size="35"/><br/>
+    
+    <input id="signin-submit" input type="submit" class = "button" value="Enter Username"/>
+
+    </form>
+
+</body>
+</html>
